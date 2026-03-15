@@ -13,3 +13,4 @@ The solution integrates a processing pipeline that normalizes Google Earth image
 | **GSD Normalization** | Resolution adjustment to 0.5m/px. | Allows distinguishing street widths in port neighborhoods. |
 | **Semantic Segmentation** | Classification of impermeable soils. | Precise identification of concrete and asphalt slabs. |
 | **Simulation (1.8m)** | Application of flood threshold. | Detection of stagnant areas in low-lying areas. |
+![Preliminary Analysis Results](data/results_veracruz.png)
