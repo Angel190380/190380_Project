@@ -1,0 +1,27 @@
+{
+    "proyecto": "Modelo de inundaciones Veracruz",
+    "etapa": "E4 - Validaci\u00f3n Estructural",
+    "metricas_viales": {
+        "Area Vial Total (m2)": 0.0003633145839602,
+        "Area Vial Expuesta (m2)": 0.0,
+        "Porcentaje de Exposicion (%)": 0.0
+    },
+    "distribucion_riesgo_asentamientos": {
+        "Bajo": 14777,
+        "Alto": 11,
+        "Medio": 2
+    },
+    "calidad_topografica": {
+        "Desviaci\u00f3n Est\u00e1ndar Urbana": 28.78094981084403,
+        "Error Promedio en Bordes": 53.863564905872416,
+        "P\u00edxeles con Ruido Detectado": 298038.0
+    },
+    "ia_config": {
+        "status": "Ready for E5",
+        "normalization_range": [
+            0,
+            1
+        ],
+        "augmentation": "Implemented"
+    }
+}
