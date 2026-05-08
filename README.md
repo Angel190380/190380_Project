@@ -19,18 +19,34 @@ The core of this solution is a robust Convolutional Neural Network (U-Net) speci
 
 - Structural Predictive Modeling: Beyond simple visual recognition, the solution focuses on structural terrain analysis. By training on precise geomorphological data, the model can predict potential flood zones based on the physical environment's capacity to retain water, rather than relying solely on temporal weather data.
 
-## 3 Image Analysis Results
-| Processing Phase | Technical Description | Observation Results |
-| :--- | :--- | :--- |
-| **GSD Normalization** | Resolution adjustment to 0.5m/px. | Allows distinguishing street widths in port neighborhoods. |
-| **Semantic Segmentation** | Classification of impermeable soils. | Precise identification of concrete and asphalt slabs. |
-| **Simulation (1.8m)** | Application of flood threshold. | Detection of stagnant areas in low-lying areas. |
-![Preliminary Analysis Results](data/results_veracruz.png)
+## 3 Repository Structure
+The project is organized according to development stages E1 through E5, ensuring a modular and traceable workflow:
+
+/src: Contains core Python processing scripts, including modules for data cleaning, geospatial preprocessing, and automated patch generation for model input.
+
+/models: Includes the formal U-Net architecture definitions and the pre-trained weights (checkpoints) required for inference and further fine-tuning.
+
+/notebooks: A collection of Jupyter Notebooks providing a step-by-step walkthrough of each stage (E1-E5). These are pre-configured for seamless execution within Google Colab.
+
+/data: Contains processed data samples derived from the CEM (Continuo de Elevaciones Mexicano) or detailed instructions on how to download the full dataset from official sources.
+
+## 4. Execution Instructions (Self-contained)
+To run this project locally or via Google Colab, follow these steps:
+
+Clone the repository:
+Use Git to replicate the project environment on your local machine:
+git clone https://github.com/Angel190380/190380_Project.git
+
+Install dependencies:
+Ensure your environment meets the requirements by installing the necessary packages (including specialized libraries like Rasterio, GeoPandas, and PyTorch):
+pip install -r requirements.txt
+
+Run the project:
+Navigate to the /notebooks directory and open the main notebook to begin the end-to-end prediction process.
 
 
----
 
-## 4. Attribution and AI Usage Declaration
+## 5. Attribution and AI Usage Declaration
 
 ### AI Usage Declaration
 In compliance with the activity instructions, it is declared that the **Gemini (Google)** language model was used as a research and coding assistant for:
