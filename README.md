@@ -9,15 +9,15 @@ This project addresses that gap by proposing a solution that prioritizes urban t
 ## 2. Solution Statement
 The core of this solution is a robust Convolutional Neural Network (U-Net) specifically architected for the semantic segmentation of flood-risk areas. By processing complex multichannel datasets, the model can effectively distinguish between safe zones and critical accumulation points with high spatial accuracy.
 
-Data Sources: The model leverages the Continuo de Elevaciones Mexicano (CEM 3.0) provided by INEGI. This high-resolution topographic data is essential for structural validation, allowing the network to understand the physical contours and slopes of the terrain that dictate water flow.
+- Data Sources: The model leverages the Continuo de Elevaciones Mexicano (CEM 3.0) provided by INEGI. This high-resolution topographic data is essential for structural validation, allowing the network to understand the physical contours and slopes of the terrain that dictate water flow.
 
-Architecture Implementation: We implemented a customized U-Net architecture using PyTorch. This framework was chosen for its flexibility in handling deep learning layers, enabling efficient feature extraction and precise localization through its symmetrical encoder-decoder structure.
+- Architecture Implementation: We implemented a customized U-Net architecture using PyTorch. This framework was chosen for its flexibility in handling deep learning layers, enabling efficient feature extraction and precise localization through its symmetrical encoder-decoder structure.
 
-Optimization Metric: To ensure high performance, we utilized Dice Loss as our primary loss function. This is crucial for handling the inherent class imbalance in flood segmentation, where at-risk pixels are often significantly outnumbered by non-risk areas.
+- Optimization Metric: To ensure high performance, we utilized Dice Loss as our primary loss function. This is crucial for handling the inherent class imbalance in flood segmentation, where at-risk pixels are often significantly outnumbered by non-risk areas.
 
-Multichannel Processing: The system integrates a multichannel dataset that combines raw elevation data with derived topographical indices. This multi-layered approach allows the neural network to identify subtle patterns in urban drainage that a single-channel analysis would miss.
+- Multichannel Processing: The system integrates a multichannel dataset that combines raw elevation data with derived topographical indices. This multi-layered approach allows the neural network to identify subtle patterns in urban drainage that a single-channel analysis would miss.
 
-Structural Predictive Modeling: Beyond simple visual recognition, the solution focuses on structural terrain analysis. By training on precise geomorphological data, the model can predict potential flood zones based on the physical environment's capacity to retain water, rather than relying solely on temporal weather data.
+- Structural Predictive Modeling: Beyond simple visual recognition, the solution focuses on structural terrain analysis. By training on precise geomorphological data, the model can predict potential flood zones based on the physical environment's capacity to retain water, rather than relying solely on temporal weather data.
 
 ## 3 Image Analysis Results
 | Processing Phase | Technical Description | Observation Results |
