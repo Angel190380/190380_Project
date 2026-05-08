@@ -19,7 +19,7 @@ The core of this solution is a robust Convolutional Neural Network (U-Net) speci
 
 - Structural Predictive Modeling: Beyond simple visual recognition, the solution focuses on structural terrain analysis. By training on precise geomorphological data, the model can predict potential flood zones based on the physical environment's capacity to retain water, rather than relying solely on temporal weather data.
 
-## 3 Repository Structure
+## 3. Repository Structure
 The project is organized according to development stages E1 through E5, ensuring a modular and traceable workflow:
 
 /src: Contains core Python processing scripts, including modules for data cleaning, geospatial preprocessing, and automated patch generation for model input.
