@@ -30,23 +30,7 @@ The project is organized according to development stages E1 through E5, ensuring
 
 /data: Contains processed data samples derived from the CEM (Continuo de Elevaciones Mexicano) or detailed instructions on how to download the full dataset from official sources.
 
-## 4. Execution Instructions (Self-contained)
-To run this project locally or via Google Colab, follow these steps:
-
-Clone the repository:
-Use Git to replicate the project environment on your local machine:
-git clone https://github.com/Angel190380/190380_Project.git
-
-Install dependencies:
-Ensure your environment meets the requirements by installing the necessary packages (including specialized libraries like Rasterio, GeoPandas, and PyTorch):
-pip install -r requirements.txt
-
-Run the project:
-Navigate to the /notebooks directory and open the main notebook to begin the end-to-end prediction process.
-
-
-
-## 5. Attribution and AI Usage Declaration
+## 4. Attribution and AI Usage Declaration
 
 AI Usage Declaration
 In compliance with the activity instructions, it is declared that the Gemini (Google) language model was used as a research and coding assistant for:
