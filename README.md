@@ -30,7 +30,38 @@ The project is organized according to development stages E1 through E5, ensuring
 
 /data: Contains processed data samples derived from the CEM (Continuo de Elevaciones Mexicano) or detailed instructions on how to download the full dataset from official sources.
 
-## 4. Attribution and AI Usage Declaration
+## 4. Development Stages
+E1: Data Acquisition
+This stage involves the collection of high-resolution geospatial and elevation data: 
+•	INEGI (CEM 3.0): Digital Terrain Model (DTM) with a 1.5-meter resolution. 
+•	Topographic Maps: Georeferenced municipal maps and Edafología Serie III (Carta E1403) from INEGI. 
+•	Satellite Imagery: High-resolution data from Google Earth and the Copernicus Data Space Ecosystem. 
+E2: Segmentation and Elevation Extraction
+During this phase, raw data is processed to generate the primary terrain model: 
+•	Master Elevation Mosaic: Created by merging four INEGI quadrants (e14b49b1 to e14b49b4) using matrix union (np.hstack and np.vstack) to preserve the 1.5m native resolution and eliminate interpolation artifacts. 
+•	Data Normalization: "NoData" values were standardized to -9999, capturing a real elevation range for the Port of Veracruz from -1.49m to 72.24m. 
+•	Geometric Analysis: Generation of slope and aspect maps (runoff routes), surface roughness layers, and refined urban infrastructure masks to improve precision in built-up areas. 
+E3: Data Integration
+Layers from diverse sources are synchronized under a 1.5-meter resolution Master Grid: 
+•	Code Infrastructure: Automated pipelines executed in Google Colab, including E3 Data Integration.ipynb for reprojection and Meta Dataset.ipynb for data dictionary generation. 
+•	Multichannel Dataset: A GeoTIFF file consisting of 4 bands (Elevation, Edaphology, Infrastructure, and Urban Layer) optimized for PyTorch training. 
+•	Risk Mapping: Identification of static risk zones under a 3.0 msnm threshold and assessment of vulnerable infrastructure. 
+E4: Structural Validation and Ground Truth
+Geospatial data was transformed into a field-truth standard for training deep learning models: 
+•	Validation Procedure: A spatial intersection was performed between the CEM and the urban infrastructure of Veracruz, Boca del Río, and Medellín. 
+•	Risk Criterion: A critical threshold of 3 msnm (meters above sea level) was established to categorize structural vulnerability. 
+•	Output: Generation of binarized risk maps in .npy format to serve as the ground truth for the IA. 
+E5: Predictive Modeling and Neuronal Inference
+The project migrated from static analysis to an autonomous inference system based on convolutional neural networks: 
+•	Architecture: Implementation of a U-Net designed for semantic segmentation, optimized for high-resolution raster data. 
+•	Training Strategy: Used Data Augmentation (mirroring) and Random Cropping (512x512 patches) for efficient memory management. 
+•	Optimization: Utilized Dice Loss to handle class imbalance, prioritizing the precision of flood-zone shapes. 
+•	Geographic Synthesis: Systematic sliding-window inference to reconstruct the total georeferenced prediction map for Veracruz in .tif format. 
+Previous observations. 
+The U-Net model demonstrated high efficacy, reaching a Recall of 0.94, which indicates the system identifies nearly all vulnerable areas. While the model shows a moderate rate of false positives (Precision 0.39; IoU 0.5943), it achieved an F1-Score of 0.75 in the risk category. These results confirm the network detects complex topographic patterns beyond simple elevation thresholds, validating Computer Vision as a viable tool for dynamic risk management in coastal urban environments. 
+
+
+## 5. Attribution and AI Usage Declaration
 
 AI Usage Declaration
 In compliance with the activity instructions, it is declared that the Gemini (Google) language model was used as a research and coding assistant for:
