@@ -48,13 +48,20 @@ Navigate to the /notebooks directory and open the main notebook to begin the end
 
 ## 5. Attribution and AI Usage Declaration
 
-### AI Usage Declaration
-In compliance with the activity instructions, it is declared that the **Gemini (Google)** language model was used as a research and coding assistant for:
-* **Logical structuring** of the data pipeline and file architecture.
-* **Optimization and debugging** of Computer Vision scripts (specifically for the GSD normalization logic and bitmask operations).
-* **Technical writing** of the documentation and this README file.
+AI Usage Declaration
+In compliance with the activity instructions, it is declared that the Gemini (Google) language model was used as a research and coding assistant for:
 
-### Code Citations and Attributions
-* **U-Net Architecture:** The semantic segmentation network structure is based on the original model by *Ronneberger et al.*, adapted using the standard implementation available in the official **TensorFlow/Keras** documentation.
-* **Image Processing:** Spatial transformation, normalization, and heatmap functions utilize the open-source **OpenCV (Open Source Computer Vision Library)**.
-* **Satellite Data:** Imagery used for preliminary testing was obtained via **Google Earth**, respecting the terms of use for educational and research purposes.
+- Logical structuring of the multichannel data pipeline and file architecture.
+
+- Optimization and debugging of Computer Vision scripts, specifically for geospatial preprocessing and PyTorch-based U-Net implementation.
+
+- Technical writing of the documentation.
+
+Code Citations and Attributions
+- U-Net Architecture: The semantic segmentation network structure is based on the original model by Ronneberger et al., implemented and adapted using the PyTorch framework.
+
+- Geospatial Processing: Data manipulation, spatial transformations, and raster operations utilize the open-source libraries Rasterio, GeoPandas, and OpenCV.
+
+- Topographic Data: Elevation data used for structural validation was obtained via the Continuo de Elevaciones Mexicano (CEM 3.0) from INEGI, ensuring the model remains grounded in official geophysical terrain data.
+
+- Development Environment: The workflow was developed and tested using Google Colab, utilizing its cloud-based GPU resources for model training and validation.
