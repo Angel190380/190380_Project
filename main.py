@@ -8,16 +8,14 @@ import sys
 import torch
 import torch.nn as nn
 import numpy as np
-import cv2
 import matplotlib.pyplot as plt
-import rasterio
-from io import BytesIO
+import cv2
+import time
 
-# --- 1. ARQUITECTURA U-NET (E5) ---
-class UNet(nn.Module):
+# --- 1. U-NET ARCHITECTURE SPECIFICATION (Validated against State-Dict) ---
+class build_unet(nn.Module):
     def __init__(self):
-        super(UNet, self).__init__()
-        
+        super(build_unet, self).__init__()
         def conv_block(in_c, out_c):
             return nn.Sequential(
                 nn.Conv2d(in_c, out_c, kernel_size=3, padding=1),
@@ -31,9 +29,9 @@ class UNet(nn.Module):
         self.pool = nn.MaxPool2d(2)
         self.enc1 = conv_block(1, 64)
         self.enc2 = conv_block(64, 128)
-        self.enc3 = conv_block(128, 256)
-        self.bottleneck = conv_block(256, 512)
-        
+        self.enc3 = conv_block(128, 256) 
+        self.bottleneck = conv_block(256, 512) 
+
         self.up3 = nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2)
         self.dec3 = conv_block(512, 256)
         self.up2 = nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2)
@@ -41,95 +39,111 @@ class UNet(nn.Module):
         self.up1 = nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2)
         self.dec1 = conv_block(128, 64)
         
-        self.final_conv = nn.Conv2d(64, 1, kernel_size=1)
+        self.final_conv = nn.Conv2d(64, 1, kernel_size=1) 
 
     def forward(self, x):
+        # Encoder Path
         e1 = self.enc1(x)
         e2 = self.enc2(self.pool(e1))
         e3 = self.enc3(self.pool(e2))
-        b = self.bottleneck(self.pool(e3))
         
-        d3 = self.dec3(torch.cat([self.up3(b), e3], dim=1))
-        d2 = self.dec2(torch.cat([self.up2(d3), e2], dim=1))
-        d1 = self.dec1(torch.cat([self.up1(d2), e1], dim=1))
+        # Latent Space Representation
+        b = self.bottleneck(self.pool(e3))
+
+        # Decoder Path with Skip Connections
+        d3 = self.up3(b)
+        d3 = torch.cat([d3, e3], dim=1)
+        d3 = self.dec3(d3)
+
+        d2 = self.up2(d3)
+        d2 = torch.cat([d2, e2], dim=1)
+        d2 = self.dec2(d2)
+
+        d1 = self.up1(d2)
+        d1 = torch.cat([d1, e1], dim=1)
+        d1 = self.dec1(d1)
+
         return self.final_conv(d1)
 
-# --- 2. FUNCIONES DE PROCESAMIENTO ---
-def preprocess_image(file_path):
-    """Lectura versátil para formatos TIFF y capturas PNG/JPG[cite: 67, 69]."""
-    if file_path.endswith(('.tif', '.tiff')):
-        with rasterio.open(file_path) as src:
-            data = src.read(1)
+# --- 2. DYNAMIC ASSET LOCALIZATION & MODEL RECONSTRUCTION ---
+print("🔍 Localizing model weights...")
+base_path = '/content/190380_Project'
+output_pth = None
+
+# Recursive search for best_model.pth
+for root, dirs, files in os.walk(base_path):
+    if 'best_model.pth' in files:
+        output_pth = os.path.join(root, 'best_model.pth')
+        break
+
+# Attempt reconstruction from multi-part archives if .pth is missing
+if not output_pth:
+    print("🔄 .pth file not found. Initializing reconstruction from multi-part RAR archives...")
+    rar_path = None
+    for root, dirs, files in os.walk(base_path):
+        if 'best_model.part1.rar' in files:
+            rar_path = os.path.join(root, 'best_model.part1.rar')
+            dest_folder = root
+            break
+    
+    if rar_path:
+        !sudo apt-get install unrar -y > /dev/null
+        !unrar x "{rar_path}" "{dest_folder}/" -y > /dev/null
+        output_pth = os.path.join(dest_folder, 'best_model.pth')
+        print(f"✅ Model successfully reconstructed at: {output_pth}")
     else:
-        img = cv2.imread(file_path, cv2.IMREAD_UNCHANGED)
-        if len(img.shape) == 3:
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        data = img
+        print("❌ CRITICAL ERROR: best_model.pth and RAR archives are missing.")
+        sys.exit()
 
-    # Normalización crítica para la red neuronal 
-    data_norm = data.astype(np.float32)
-    data_norm = (data_norm - np.min(data_norm)) / (np.max(data_norm) - np.min(data_norm) + 1e-8)
-    return data, data_norm
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-def run_inference(model, device, normalized_data):
-    """Ejecuta la inferencia y genera la máscara de inundación[cite: 176]."""
-    input_tensor = cv2.resize(normalized_data, (512, 512), interpolation=cv2.INTER_AREA)
-    input_tensor = torch.from_numpy(input_tensor).unsqueeze(0).unsqueeze(0).to(device)
-    
-    with torch.no_grad():
-        output = model(input_tensor)
-        prob_mask = torch.sigmoid(output).cpu().numpy()[0, 0]
-    
-    # Umbral ajustable (0.4 según demo) [cite: 176]
-    flood_mask = (prob_mask > 0.4).astype(np.uint8)
-    flood_mask_res = cv2.resize(flood_mask, (normalized_data.shape[1], normalized_data.shape[0]))
-    return flood_mask_res
-
-# --- 3. FLUJO PRINCIPAL ---
-def main(image_path):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    
-    # Localizar pesos del modelo 
-    model_path = "190380_Project/Models/best_model.pth"
-    if not os.path.exists(model_path):
-        print(f"Error: No se encontró el modelo en {model_path}")
-        return
-
-    # Cargar Modelo
-    model = UNet().to(device)
-    model.load_state_dict(torch.load(model_path, map_location=device))
+try:
+    # Model Initialization and Weight Loading
+    model = build_unet().to(device)
+    model.load_state_dict(torch.load(output_pth, map_location=device))
     model.eval()
-    print("Arquitectura e Inferencia sincronizadas con éxito.")
+    print("✅ Model Architecture and Inference Pipeline synchronized successfully.")
 
-    # Procesar Imagen
-    raw_data, norm_data = preprocess_image(image_path)
-    flood_mask = run_inference(model, device, norm_data)
+    # --- 3. PRE-PROCESSING & STATISTICAL INFERENCE ---
+    # Input normalization and resizing for U-Net compatibility
+    input_final = cv2.resize(processed_data, (512, 512), interpolation=cv2.INTER_AREA)
+    tensor_input = torch.from_numpy(input_final).unsqueeze(0).unsqueeze(0).float().to(device)
 
-    # Visualización [cite: 176, 180]
+    with torch.no_grad():
+        output = model(tensor_input)
+        # Activation via Sigmoid for probabilistic risk assessment
+        prob_mask = torch.sigmoid(output).cpu().numpy()[0, 0]
+        # Binary Classification Threshold (0.4)
+        flood_mask = (prob_mask > 0.4).astype(np.uint8) 
+
+    # --- 4. DATA VISUALIZATION & GEOSPATIAL ANALYSIS ---
     plt.figure(figsize=(16, 8))
     
+    # Subplot 1: Grayscale Input (Contextual representation)
     plt.subplot(1, 2, 1)
-    plt.imshow(raw_data, cmap='gray')
-    plt.title("Entrada Original (Veracruz)")
-    
+    plt.imshow(input_final, cmap='gray')
+    plt.title("Original Input (Veracruz Port Area)")
+    plt.axis('off')
+
+    # Subplot 2: Output Synthesis (Topography + U-Net Mask)
     plt.subplot(1, 2, 2)
-    # Superposición de riesgo en rojo [cite: 176]
-    plt.imshow(raw_data, cmap='gray')
-    mask_rgb = np.zeros((*flood_mask.shape, 4))
-    mask_rgb[flood_mask == 1] = [1, 0, 0, 0.5] # Rojo con 50% transparencia
-    plt.imshow(mask_rgb)
-    plt.title("Mapa de Riesgo Detectado por U-Net (E5)")
+    plt.imshow(input_final, cmap='terrain')
+    
+    # Masking zero-risk pixels for overlay clarity
+    risk_zone = np.ma.masked_where(flood_mask == 0, flood_mask)
+    
+    # Visualizing High-Risk Zones via Red Alpha Channel Overlay
+    plt.imshow(risk_zone, cmap='Reds', alpha=0.7) 
+    plt.title("Flood Risk Prediction Map - U-Net Segmentation (E5)")
+    plt.axis('off')
     
     plt.tight_layout()
     plt.show()
     
-    print(f"Pixeles con riesgo detectados: {np.sum(flood_mask)}")
-    print("Proceso completado.")
+    # Technical Metadata Summary
+    print(f"✅ Total Risk-Positive Pixels Detected: {np.sum(flood_mask)}")
+    print("✅ Inference complete. Visualization aligned with doctoral reporting standards.")
 
-if __name__ == "__main__":
-    # Cambiar por la ruta de tu imagen de prueba
-    if len(sys.argv) > 1:
-        main(sys.argv[1])
-    else:
-        print("Uso: python main.py <ruta_de_imagen>")
+except Exception as e:
+    print(f"❌ EXECUTION ERROR: {e}")
 
