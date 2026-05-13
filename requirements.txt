@@ -1,19 +1,16 @@
 # --- Project Requirements (Stages E1-E5) ---
 
-# Data Acquisition & Geospatial Processing (E1-E3)
-rasterio>=1.3.0
-geopandas>=0.13.0
-numpy>=1.24.0
-
-# Computer Vision & Image Processing (E4)
+# --- Core Deep Learning & Computer Vision ---
+torch>=2.1.0
+torchvision>=0.16.0
 opencv-python>=4.8.0
-pillow>=10.0.0
-scikit-image>=0.21.0
 
-# Deep Learning & Modeling (E5)
-tensorflow>=2.14.0
-# Optional: torch>=2.0.0 (Only if using PyTorch for U-Net)
+# --- Geospatial & Data Analysis ---
+rasterio>=1.3.0
+geopandas>=0.14.0
+numpy>=1.24.0
+pandas>=2.0.0
 
-# Visualization & Reporting
+# --- Visualization & Utilities ---
 matplotlib>=3.7.0
-seaborn>=0.12.0
+pillow>=10.0.0
