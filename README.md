@@ -32,45 +32,45 @@ The project is organized according to development stages E1 through E5, ensuring
 
 ## 4. Development Stages
 
-E1: Data Acquisition
+### E1: Data Acquisition
 
 This stage involves the collection of high-resolution geospatial and elevation data: 
 - INEGI (CEM 3.0): Digital Terrain Model (DTM) with a 1.5-meter resolution.
 - Topographic Maps: Georeferenced municipal maps and Edafología Serie III (Carta E1403) from INEGI.
 - Satellite Imagery: High-resolution data from Google Earth and the Copernicus Data Space Ecosystem. 
 
-E2: Segmentation and Elevation Extraction
+### E2: Segmentation and Elevation Extraction
 During this phase, raw data is processed to generate the primary terrain model: 
 - Master Elevation Mosaic: Created by merging four INEGI quadrants (e14b49b1 to e14b49b4) using matrix union (np.hstack and np.vstack) to preserve the 1.5m native resolution and eliminate interpolation artifacts.
 - Data Normalization: "NoData" values were standardized to -9999, capturing a real elevation range for the Port of Veracruz from -1.49m to 72.24m.
 - Geometric Analysis: Generation of slope and aspect maps (runoff routes), surface roughness layers, and refined urban infrastructure masks to improve precision in built-up areas. 
 
-E3: Data Integration
+### E3: Data Integration
 Layers from diverse sources are synchronized under a 1.5-meter resolution Master Grid: 
 - Code Infrastructure: Automated pipelines executed in Google Colab, including E3 Data Integration.ipynb for reprojection and Meta Dataset.ipynb for data dictionary generation.
 - Multichannel Dataset: A GeoTIFF file consisting of 4 bands (Elevation, Edaphology, Infrastructure, and Urban Layer) optimized for PyTorch training.
 - Risk Mapping: Identification of static risk zones under a 3.0 msnm threshold and assessment of vulnerable infrastructure. 
 
-E4: Structural Validation and Ground Truth
+### E4: Structural Validation and Ground Truth
 Geospatial data was transformed into a field-truth standard for training deep learning models: 
 - Validation Procedure: A spatial intersection was performed between the CEM and the urban infrastructure of Veracruz, Boca del Río, and Medellín.
 - Risk Criterion: A critical threshold of 3 msnm (meters above sea level) was established to categorize structural vulnerability.
 - Output: Generation of binarized risk maps in .npy format to serve as the ground truth for the IA. 
 
-E5: Predictive Modeling and Neuronal Inference (Final Master Pipeline)
+### E5: Predictive Modeling and Neuronal Inference (Final Master Pipeline)
 The project culminated in an autonomous inference system (Final_Pred_DEMO.ipynb) that bridges the gap between raw topographic data and actionable risk intelligence:
 
-Architecture: Implementation of a robust U-Net for semantic segmentation, featuring Batch Normalization and a latent space depth of 512 filters to ensure precise feature extraction.
+- Architecture: Implementation of a robust U-Net for semantic segmentation, featuring Batch Normalization and a latent space depth of 512 filters to ensure precise feature extraction.
 
-Dynamic Weight Reconstruction: Due to repository constraints, the 27MB trained model is managed via a multi-part RAR archive system, reconstructed automatically during the inference pipeline to ensure environment portability.
+- Dynamic Weight Reconstruction: Due to repository constraints, the 27MB trained model is managed via a multi-part RAR archive system, reconstructed automatically during the inference pipeline to ensure environment portability.
 
-Inference Strategy: Utilization of a sliding-window approach with Sigmoid Activation, enabling a probabilistic assessment of flood risks across the Veracruz Port area.
+- Inference Strategy: Utilization of a sliding-window approach with Sigmoid Activation, enabling a probabilistic assessment of flood risks across the Veracruz Port area.
 
-Geospatial Synthesis: Real-time generation of dual-mode visualizations—comparing raw grayscale inputs against high-contrast terrain risk maps (Reds overlay)—detecting, for instance, up to 8,390 risk-positive pixels in specific high-resolution urban patches.
+- Geospatial Synthesis: Real-time generation of dual-mode visualizations—comparing raw grayscale inputs against high-contrast terrain risk maps (Reds overlay)—detecting, for instance, up to 8,390 risk-positive pixels in specific high-resolution urban patches.
 
-Performance Metrics: The model demonstrates high efficacy with a Recall of 0.94, ensuring nearly all vulnerable areas are identified. While maintaining an F1-Score of 0.75, the system proves capable of detecting complex topographic patterns beyond simple elevation thresholds.
+- Performance Metrics: The model demonstrates high efficacy with a Recall of 0.94, ensuring nearly all vulnerable areas are identified. While maintaining an F1-Score of 0.75, the system proves capable of detecting complex topographic patterns beyond simple elevation thresholds.
 
-Previous observations. 
+### Previous observations. 
 The U-Net model demonstrated high efficacy, reaching a Recall of 0.94, which indicates the system identifies nearly all vulnerable areas. While the model shows a moderate rate of false positives (Precision 0.39; IoU 0.5943), it achieved an F1-Score of 0.75 in the risk category. These results confirm the network detects complex topographic patterns beyond simple elevation thresholds, validating Computer Vision as a viable tool for dynamic risk management in coastal urban environments. 
 
 
